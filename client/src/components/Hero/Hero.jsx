@@ -18,6 +18,8 @@ const Hero = () => {
 
   const [followers,setFollowers] = useState([])
 
+  const [acc,setAcc] = useState("None")
+
   useEffect(() => {
     const connectWallet = async () => {
       const contactAddress = "0xa3F06a52FdFfA21BcB281c878a5d727228362366";
@@ -30,16 +32,32 @@ const Hero = () => {
           const account = await ethereum.request({
             method: "eth_requestAccounts",
           });
+
+          //jokhon amra test network or account change korbo tokhn browser ke reload kore debe bas
+          window.ethereum.on("chainChanged",()=>{
+            window.location.reload();
+          })
+
+           window.ethereum.on("accountsChanged",()=>{
+            window.location.reload();
+          })
+
           // console.log(account)
-        }
-        const provider = new ethers.providers.Web3Provider(ethereum);
+                  const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const contract = new ethers.Contract(
           contactAddress,
           contractAbi,
           signer
         );
+        setAcc(account);
         setFormData({ provider, signer, contract });
+        }
+        else
+        {
+          alert("Please Install Metamask");
+        }
+
       } catch (e) {
         console.log(e);
       }
@@ -117,7 +135,7 @@ const Hero = () => {
         />
         <button
           type="submit"
-          className="p-3 bg-sky-900 m-3 rounded-md text-white"
+          className={`p-3 bg-sky-900 m-3 rounded-md text-white ${!formData.contract ? "disabled":""}`}
         >
           Send
         </button>
